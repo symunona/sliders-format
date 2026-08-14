@@ -8,6 +8,8 @@ import brushIcon from '../../node_modules/@tabler/icons/icons/brush.svg?raw';
 import frameIcon from '../../node_modules/@tabler/icons/icons/frame.svg?raw';
 import handClickIcon from '../../node_modules/@tabler/icons/icons/hand-click.svg?raw';
 import linkIcon from '../../node_modules/@tabler/icons/icons/link.svg?raw';
+// New in the Sliders fork.
+import masksTheaterIcon from '../../node_modules/@tabler/icons/icons/masks-theater.svg?raw';
 
 /**
  * @see https://github.com/klembot/twinejs/blob/develop/EXTENDING.md#codemirror-toolbar
@@ -37,6 +39,37 @@ export function toolbar(
   const hasSelection = editor.getDoc().somethingSelected();
 
   return [
+    // New in the Sliders fork. First, because it is the reason this format
+    // exists.
+    {
+      type: 'menu',
+      icon: iconSource(masksTheaterIcon, foregroundColor),
+      label: 'Scene',
+      disabled: hasSelection,
+      items: [
+        {
+          type: 'button',
+          label: 'Insert Scene',
+          command: 'insertScene'
+        },
+        {type: 'separator'},
+        {
+          type: 'button',
+          label: 'Cast and Props',
+          command: 'insertSceneCast'
+        },
+        {
+          type: 'button',
+          label: 'Beats',
+          command: 'insertSceneBeats'
+        },
+        {
+          type: 'button',
+          label: 'Links',
+          command: 'insertSceneLinks'
+        }
+      ]
+    },
     {
       type: 'menu',
       icon: iconSource(brushIcon, foregroundColor),

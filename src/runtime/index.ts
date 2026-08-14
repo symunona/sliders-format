@@ -3,6 +3,7 @@ import {initBackstage} from './backstage';
 import {initDisplay} from './display';
 import {initExtensibility} from './extensibility';
 import {initLoggerState, loggerDefaults} from './logger';
+import {initSliders} from './sliders';
 import {initSound} from './sound';
 import {
 	canRestoreFromStorage,
@@ -55,6 +56,9 @@ export function init() {
   initLookups();
   initSound();
   initStory();
+  // New in the Sliders fork. After initStory(), because the scene index reads
+  // every passage in the story.
+  initSliders();
 
   if (get('config.testing')) {
     initBackstage();

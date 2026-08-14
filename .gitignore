@@ -3,3 +3,6 @@ guide/_book
 dist
 playwright-report
 test-results
+
+# Sliders: upstream did not ignore this, and it is 695 packages.
+node_modules

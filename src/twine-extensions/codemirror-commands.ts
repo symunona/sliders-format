@@ -39,6 +39,53 @@ function makeWrapTextCommands(
 	);
 }
 
+// ---------------------------------------------------------------------------
+// New in the Sliders fork: `[scene]` skeletons.
+//
+// Everything an author needs to see the shape of a scene, with values that
+// actually work: a stage, two characters, a few beats, and two links. YAML is
+// indentation-sensitive, so these are written out literally rather than
+// assembled, and every line uses two-space indents.
+// ---------------------------------------------------------------------------
+
+const SCENE_SKELETON = `
+[scene]
+id: scene-id
+bg: backdrop-id
+cast:
+  mira:  {at: -0.4, frame: idle}
+  joren: {at: 0.35, frame: idle, flip: true}
+beats:
+  - mira: "Something worth saying."
+  - joren: "And a reply."
+links:
+  onward: {to: Next Passage}
+
+[continued]
+`;
+
+const SCENE_BEATS = `
+beats:
+  - mira: "Dialogue."
+  - mira: {frame: angry, at: -0.25, say: "Dialogue and a stage change."}
+  - box: "Narration, with no speaker."
+  - wait: 0.5
+  - mark: name-this-state
+`;
+
+const SCENE_CAST = `
+cast:
+  mira: {at: -0.4, frame: idle}
+props:
+  candle: {at: [0.1, -0.2], layer: front}
+`;
+
+const SCENE_LINKS = `
+links:
+  stay: {to: Passage Name}
+  go:   {to: Other Passage, if: some_variable}
+`;
+
 export const commands = {
   ...makeWrapTextCommands({
     boldText: {
@@ -59,6 +106,11 @@ export const commands = {
     }
   }),
   ...makeInsertTextCommands({
+    // New in the Sliders fork.
+    insertScene: SCENE_SKELETON,
+    insertSceneBeats: SCENE_BEATS,
+    insertSceneCast: SCENE_CAST,
+    insertSceneLinks: SCENE_LINKS,
     insertAfter: '\n[after 1 second]\nText\n\n[continued]',
     insertAppend: '\n[append]\n',
     insertBlockquote: '\n<blockquote>Text</blockquote>\n',

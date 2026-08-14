@@ -5,6 +5,12 @@
 		"module": "ESNext",
 		"lib": ["ESNext", "DOM", "DOM.Iterable"],
 		"moduleResolution": "Node",
+		// New in the Sliders fork: the same @sliders/* resolution vite.sliders-alias.js
+		// does, so tsc and the editor agree with the bundler.
+		"baseUrl": ".",
+		"paths": {
+			"@sliders/*": ["../twinejs-sliders/packages/*/src/index.ts"]
+		},
 		"strict": true,
 		"resolveJsonModule": true,
 		"isolatedModules": true,

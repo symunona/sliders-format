@@ -1,6 +1,12 @@
 The MIT License (MIT)
 
-Copyright (c) 2018 Chris Klimas
+Copyright (c) 2018 Chris Klimas (Chapbook, the story format this is forked from)
+Copyright (c) 2026 Sliders contributors (the Sliders fork)
+
+Sliders is a fork of Chapbook (https://github.com/klembot/chapbook) by Chris
+Klimas. The overwhelming majority of this code is his. Sliders adds a `[scene]`
+modifier and its supporting Twine editor extensions on top of it, and is
+released under the same MIT license as the original.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -5,6 +5,8 @@
 export const loggerDefaults = {
 	'config.logger.show.parse': false,
 	'config.logger.show.render': false,
+	// New in the Sliders fork.
+	'config.logger.show.scene': true,
 	'config.logger.show.sound': false,
 	'config.logger.show.state': false,
 	'config.logger.show.story': false,

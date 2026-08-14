@@ -1,0 +1,62 @@
+:: Scene modifier
+This is the one thing Sliders adds to Chapbook. Click the stage to advance beats.
+
+[scene]
+id: tavern-night
+bg: tavern/night
+camera: {at: [0, 0], zoom: 1}
+cast:
+  mira:  {at: -0.4, frame: arms-crossed}
+  joren: {at: 0.35, frame: idle, flip: true, layer: back}
+props:
+  candle: {at: [0.1, -0.2], layer: front}
+fx: [rain@0.6]
+beats:
+  - mira: "You shouldn't have come back."
+  - joren: "And yet."
+  - mira: {frame: angry, at: -0.25, say: "Get out."}
+  - wait: 0.5
+  - mark: tense
+  - box: "The candle gutters."
+links:
+  stay: {to: Scene modifier patch}
+  go: {to: Start}
+
+[note]
+Director: she should feel cornered. This is Chapbook's own note modifier, and it
+is not rendered.
+
+[continued]
+Normal Chapbook Markdown still works down here. **Bold**, *italic*, and
+{link to: 'Start', label: 'inserts'} are all unaffected.
+
+:: Scene modifier patch
+A scene with `from:` is a patch over another scene's state, not a snapshot.
+Anything it doesn't mention is inherited.
+
+[scene]
+id: tavern-fight
+from: tavern-night@tense
+cast:
+  mira: {frame: angry}
+beats:
+  - mira: "Then draw."
+links:
+  back: {to: Scene modifier}
+
+:: Scene modifier errors
+A scene that doesn't parse still renders whatever could be understood, and
+reports the rest through Chapbook's warning list rather than throwing.
+
+[scene]
+id: broken
+bgg: typo-in-a-top-level-key
+cast:
+  mira: {at: nonsense, layer: sideways}
+beats:
+  - wait: soon
+links:
+  nowhere: {}
+
+[continued]
+[[Start]]

@@ -8,6 +8,8 @@ import {defineConfig} from 'vite';
 import checker from 'vite-plugin-checker';
 import {createHtmlPlugin} from 'vite-plugin-html';
 import {viteSingleFile} from 'vite-plugin-singlefile';
+// New in the Sliders fork.
+import {slidersAliases} from './vite.sliders-alias.js';
 
 const isRelease = process.env.NODE_ENV === 'production';
 
@@ -58,6 +60,10 @@ const demoAssetPlugin = {
 };
 
 export default defineConfig(async () => ({
+  // New in the Sliders fork: resolves @sliders/* to the real packages when
+  // they exist, and to placeholders under src/runtime/sliders/stub/ when they
+  // don't.
+  resolve: {alias: slidersAliases()},
   build: {
     emptyOutDir: true,
     outDir: '../../build/'

@@ -1,0 +1,46 @@
+/* New in the Sliders fork.
+ *
+ * Only the host element is styled here. Everything inside the stage --
+ * backdrop, layers, entities, bubbles, narration box -- is styled by
+ * @sliders/render-dom, which injects its own CSS on mount so that the story
+ * format, the live preview and the visual editor all look the same.
+ */
+
+sliders-stage {
+	display: block;
+	position: relative;
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	overflow: hidden;
+	border-radius: 4px;
+	background: #111;
+	user-select: none;
+	cursor: pointer;
+}
+
+/* A cue that a click will advance, shown only while a beat is waiting on one. */
+
+sliders-stage[data-waiting='beat']::after {
+	content: '▸';
+	position: absolute;
+	right: 0.6em;
+	bottom: 0.5em;
+	z-index: 100;
+	color: #fff;
+	font-size: 0.8em;
+	opacity: 0.55;
+	pointer-events: none;
+}
+
+.sliders-stage__error {
+	position: absolute;
+	inset: 0;
+	z-index: 200;
+	overflow: auto;
+	margin: 0;
+	padding: 1em;
+	background: rgb(120 20 20 / 92%);
+	color: #fff;
+	font-size: 0.8em;
+	white-space: pre-wrap;
+}

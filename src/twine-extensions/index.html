@@ -16,7 +16,28 @@ Modified text.
 
 [[This is a link on a line by itself]]
 
-This is a [[link]], {insert}, [[pointer link->passage]], {link to: 'passage 1'}, [[pointer link|passage]], {reveal link, passage: 'passage 2'}</textarea>
+This is a [[link]], {insert}, [[pointer link->passage]], {link to: 'passage 1'}, [[pointer link|passage]], {reveal link, passage: 'passage 2'}
+
+[scene]
+id: tavern-night
+from: other-scene@tense
+bg: tavern/night
+bgg: an unknown key, shown as an error
+camera: {at: [0, 0], zoom: 1}
+cast:
+  mira:  {at: -0.4, frame: arms-crossed}
+  joren: {at: 0.35, frame: idle, flip: true, layer: back}
+fx: [rain@0.6]
+beats:
+  - mira: "Will you [[stay]] or [[go]]?"   # a comment
+  - wait: 0.5
+  - mark: tense
+links:
+  stay: {to: Tavern Fight, if: has_weapon}
+  go: Street
+
+[continued]
+Back to ordinary text.</textarea>
 		<ul id="references">
 		</ul>
 		<script src="dev.ts" type="module"></script>

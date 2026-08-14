@@ -5,10 +5,15 @@ function prefix(text: string) {
 /**
  * Logger sources that have been unmuted.
  */
+//
+// New in the Sliders fork: `scene` is unmuted by default so that scene parse
+// problems always reach `console.warn`, and therefore <warning-list> and
+// backstage. An author who wants them silenced can set
+// `config.logger.show.scene: false`.
 const unmuted: Record<string, boolean> =
 	process.env.NODE_ENV === 'production'
-		? {inserts: true}
-		: {inserts: true, state: true};
+		? {inserts: true, scene: true}
+		: {inserts: true, scene: true, state: true};
 
 /**
  * Mutes a log source.

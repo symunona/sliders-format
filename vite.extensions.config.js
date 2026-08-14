@@ -1,6 +1,9 @@
 import {defineConfig} from 'vite';
+// New in the Sliders fork.
+import {slidersAliases} from './vite.sliders-alias.js';
 
 export default defineConfig(async () => ({
+	resolve: {alias: slidersAliases()},
 	build: {
 		emptyOutDir: true,
 		lib: {

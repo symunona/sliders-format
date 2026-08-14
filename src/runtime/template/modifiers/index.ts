@@ -6,6 +6,7 @@ import {continueModifier} from './continue';
 import {cssModifier} from './css';
 import {javascriptModifier} from './javascript';
 import {noteModifier} from './note';
+import {sceneModifier} from './scene';
 import {Modifier} from './types';
 
 export * from './types';
@@ -18,7 +19,9 @@ const builtins = [
 	continueModifier,
 	cssModifier,
 	javascriptModifier,
-	noteModifier
+	noteModifier,
+	// New in the Sliders fork.
+	sceneModifier
 ];
 
 export let modifiers = [...builtins];
