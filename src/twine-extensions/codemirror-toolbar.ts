@@ -10,6 +10,11 @@ import handClickIcon from '../../node_modules/@tabler/icons/icons/hand-click.svg
 import linkIcon from '../../node_modules/@tabler/icons/icons/link.svg?raw';
 // New in the Sliders fork.
 import masksTheaterIcon from '../../node_modules/@tabler/icons/icons/masks-theater.svg?raw';
+import {
+  lastSceneLabel,
+  readLastNamedScene,
+  readLastScene
+} from './last-scene';
 
 /**
  * @see https://github.com/klembot/twinejs/blob/develop/EXTENDING.md#codemirror-toolbar
@@ -37,6 +42,10 @@ export function toolbar(
   {foregroundColor}: TwineCodemirrorToolbarEnvironment
 ) {
   const hasSelection = editor.getDoc().somethingSelected();
+  // New in the Sliders fork. Read on every toolbar build — Twine rebuilds the
+  // toolbar on cursor activity, so the labels follow the author around.
+  const lastScene = readLastScene();
+  const lastNamedScene = readLastNamedScene();
 
   return [
     // New in the Sliders fork. First, because it is the reason this format
@@ -51,6 +60,24 @@ export function toolbar(
           type: 'button',
           label: 'Insert Scene',
           command: 'insertScene'
+        },
+        {
+          type: 'button',
+          label: lastScene
+            ? `Insert Last Scene (${lastSceneLabel(lastScene)})`
+            : 'Insert Last Scene',
+          command: 'insertLastScene',
+          disabled: !lastScene
+        },
+        {
+          // An overlay needs a name to point `from:` at, so this follows the
+          // last NAMED scene, not the last one.
+          type: 'button',
+          label: lastNamedScene
+            ? `Overlay on '${lastNamedScene.id}'`
+            : 'Overlay on Last Scene',
+          command: 'insertLastSceneOverlay',
+          disabled: !lastNamedScene
         },
         {type: 'separator'},
         {

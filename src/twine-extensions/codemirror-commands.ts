@@ -1,4 +1,11 @@
 import {Editor} from 'codemirror';
+// New in the Sliders fork.
+import {
+  lastSceneCopy,
+  lastSceneOverlay,
+  readLastNamedScene,
+  readLastScene
+} from './last-scene';
 
 function makeInsertTextCommands(commands: Record<string, string>) {
 	return Object.keys(commands).reduce(
@@ -42,24 +49,51 @@ function makeWrapTextCommands(
 // ---------------------------------------------------------------------------
 // New in the Sliders fork: `[scene]` skeletons.
 //
-// Everything an author needs to see the shape of a scene, with values that
-// actually work: a stage, two characters, a few beats, and two links. YAML is
-// indentation-sensitive, so these are written out literally rather than
+// The main skeleton is deliberately exhaustive — every top-level key, every
+// entity key, every beat form, every link prop — because the fastest way to
+// learn the format is to insert it once and delete what you do not need. YAML
+// is indentation-sensitive, so these are written out literally rather than
 // assembled, and every line uses two-space indents.
+//
+// Two rules this skeleton obeys and must keep obeying:
+//   - it parses with zero errors (asserted in __tests__/codemirror-commands)
+//   - it contains no literal `[[...]]`, because Twine's own link parser reads
+//     the passage source and would silently create a passage for each one —
+//     even from inside a YAML comment.
 // ---------------------------------------------------------------------------
 
-const SCENE_SKELETON = `
+export const SCENE_SKELETON = `
 [scene]
-id: scene-id
-bg: backdrop-id
+# Every key Sliders understands. Delete the ones you do not need.
+id: scene-id                    # globally unique; needed only if something points here
+from: ~                         # inherit: other-scene, other-scene@enter, other-scene@mark-name
+bg: backdrop-id                 # asset id, never a path
+camera: {at: [0, 0], zoom: 1}   # origin is screen centre, +y is UP
+
 cast:
   mira:  {at: -0.4, frame: idle}
-  joren: {at: 0.35, frame: idle, flip: true}
+  joren: {at: 0.35, frame: idle, flip: true, layer: back, z: 2, opacity: 1}
+
+props:
+  candle: {at: [0.1, -0.2], layer: front}
+  table:  {at: 0, ref: table-asset}   # ref: when the id is not the asset id
+
+fx: [rain@0.6]                  # name@amount, or {id: rain, amount: 0.6}
+
 beats:
-  - mira: "Something worth saying."
-  - joren: "And a reply."
+  - mira: "Dialogue. The bubble hangs off her anchor."
+  - joren: {at: 0.3, frame: idle, say: "Move and speak in one beat."}
+  - mira: {at: -0.25}           # stage change, nobody speaks
+  - box: "Narration, with no speaker."
+  - wait: 0.5                   # seconds
+  - fx: thunder
+  - mark: tense                 # names this state so from: can target it
+  # A choice is a wiki link in dialogue: the link name, an arrow, and the target
+  # passage, wrapped in doubled square brackets. Props for it go under links:.
+
 links:
-  onward: {to: Next Passage}
+  onward: {to: Next Passage, if: has_weapon, icon: sword, transition: fade}
+  back:   Other Passage         # shorthand when the target is all you need
 
 [continued]
 `;
@@ -86,7 +120,28 @@ links:
   go:   {to: Other Passage, if: some_variable}
 `;
 
+// New in the Sliders fork: the two scene commands whose text is not known until
+// the moment they run, because it comes from whatever the author last edited.
+
+const lastSceneCommands = {
+  insertLastScene: (editor: Editor) => {
+    const last = readLastScene();
+
+    // The toolbar disables this when there is nothing stored; the fallback is
+    // only here so a keyboard-bound command can never insert nothing.
+    editor.replaceSelection(last ? lastSceneCopy(last) : SCENE_SKELETON);
+    editor.focus();
+  },
+  insertLastSceneOverlay: (editor: Editor) => {
+    const last = readLastNamedScene();
+
+    editor.replaceSelection(last ? lastSceneOverlay(last) : SCENE_SKELETON);
+    editor.focus();
+  }
+};
+
 export const commands = {
+  ...lastSceneCommands,
   ...makeWrapTextCommands({
     boldText: {
       matcher: /^(?:__|\*\*)(.+)(?:__|\*\*)$/,
