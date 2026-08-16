@@ -11,7 +11,7 @@
 // twinejs fork's live preview and this element behave identically.
 
 import {DialogueLayer, DomRenderer} from '@sliders/render-dom';
-import {applyScene, diffStages, runBeats} from '@sliders/scene-core';
+import {applyScene, diffStages, resolveStage, runBeats} from '@sliders/scene-core';
 import {Scene, Stage} from '@sliders/scene-types';
 import {go} from '../actions';
 import {createLoggers} from '../logger';
@@ -102,7 +102,13 @@ export class SlidersStage extends CustomElement {
 		});
 		this.#dialogue.mount(this, this.#renderer);
 
-		await this.#renderer.apply(enter, diffStages(base, enter));
+		// Resolved only here, at the draw boundary: `of:` offsets become absolute
+		// coordinates for the renderer and the differ, while the states array and
+		// the save keep the authored numbers a beat patch expects to merge onto.
+		const drawnBase = resolveStage(base);
+		const drawnEnter = resolveStage(enter);
+
+		await this.#renderer.apply(drawnEnter, diffStages(drawnBase, drawnEnter));
 		saveStage(enter);
 
 		this.addEventListener('click', this.#advance);
@@ -144,7 +150,16 @@ export class SlidersStage extends CustomElement {
 			this.#position++;
 
 			if (next !== previous) {
-				await this.#renderer?.apply(next, diffStages(previous, next));
+				// Diffed RESOLVED, so a child moves because its parent did: in authored
+				// space its own `at` never changed, and the differ would emit nothing
+				// for it — the parent would glide and the child would teleport.
+				const drawnPrevious = resolveStage(previous);
+				const drawnNext = resolveStage(next);
+
+				await this.#renderer?.apply(
+					drawnNext,
+					diffStages(drawnPrevious, drawnNext)
+				);
 				saveStage(next);
 			}
 
