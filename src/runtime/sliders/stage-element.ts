@@ -32,6 +32,25 @@ export interface StagePayload {
 	errors?: string[];
 }
 
+/**
+ * Seconds a spoken beat holds the screen before the next one runs by itself.
+ *
+ * A variable rather than a constant so a story can slow it down, speed it up, or set it to 0
+ * for the old click-only pacing -- `sliders.autoAdvance: 0` in a vars section.
+ */
+export const AUTO_ADVANCE_VAR = 'sliders.autoAdvance';
+
+/** What that variable defaults to, in seconds. */
+export const DEFAULT_AUTO_ADVANCE = 3;
+
+function autoAdvanceMs() {
+	const seconds = get(AUTO_ADVANCE_VAR);
+
+	return typeof seconds === 'number' && Number.isFinite(seconds) && seconds > 0
+		? seconds * 1000
+		: 0;
+}
+
 export function encodePayload(payload: StagePayload) {
 	return encodeURIComponent(JSON.stringify(payload));
 }
@@ -167,13 +186,13 @@ export class SlidersStage extends CustomElement {
 				case 'say':
 					this.#dialogue?.setBox(null);
 					this.#dialogue?.say(beat.who, beat.text);
-					this.setAttribute('data-waiting', 'beat');
+					this.#hold();
 					return;
 
 				case 'box':
 					this.#dialogue?.clear();
 					this.#dialogue?.setBox(beat.text);
-					this.setAttribute('data-waiting', 'beat');
+					this.#hold();
 					return;
 
 				case 'wait':
@@ -193,6 +212,21 @@ export class SlidersStage extends CustomElement {
 		// Out of beats. Whatever is on screen stays; the links under the stage
 		// are how the player moves on.
 		this.removeAttribute('data-waiting');
+	}
+
+	/**
+	 * A line is on screen. It holds for `sliders.autoAdvance` seconds and then the next beat
+	 * runs on its own; a click gets there sooner. The LAST line never times out -- the scene
+	 * is over and the links under the stage are the player's move, so it stays put.
+	 */
+	#hold() {
+		this.setAttribute('data-waiting', 'beat');
+
+		const ms = autoAdvanceMs();
+
+		if (ms > 0 && this.#position < (this.#scene?.beats?.length ?? 0)) {
+			this.#timer = window.setTimeout(() => void this.play(), ms);
+		}
 	}
 }
 
