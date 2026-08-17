@@ -1,0 +1,115 @@
+/* New in the Sliders fork.
+ *
+ * Full screen is the player's default format for a scene. <body> carries
+ * `sliders-cinema` for as long as a stage is on screen, and everything
+ * Chapbook draws around prose -- the centred column, its margin, padding,
+ * border and shadow, the header and the footer -- gets out of the way so the
+ * stage is the whole viewport. This is the editor preview's full screen, in
+ * the player.
+ *
+ * The stage itself is not styled here beyond letting it grow: @sliders/render-dom
+ * letterboxes a 16:9 box inside whatever host it is given and re-measures on
+ * resize, so filling the viewport is all this has to do.
+ */
+
+body.sliders-cinema {
+	overflow: hidden;
+}
+
+body.sliders-cinema #backdrop {
+	background-color: #000;
+	display: block;
+	min-height: 100vh;
+	min-height: 100dvh;
+}
+
+body.sliders-cinema #page {
+	background-color: #000;
+	border: none;
+	border-radius: 0;
+	box-shadow: none;
+	display: block;
+	height: 100vh;
+	height: 100dvh;
+	margin: 0;
+	max-width: none;
+	min-height: 0;
+	padding: 0;
+	/* Not 100vw: with backstage open the backdrop is only part of the window, and
+	   the stage should fill what it is given rather than slide under the sidebar. */
+	width: 100%;
+}
+
+body.sliders-cinema #page > header,
+body.sliders-cinema #page > footer {
+	display: none;
+}
+
+/* <page-transition> wraps passage output in a plain <div>, so the height has to
+   be handed down twice before anything below can measure itself against it. */
+body.sliders-cinema #page > article,
+body.sliders-cinema #page > article > div {
+	display: block;
+	height: 100%;
+	position: relative;
+}
+
+/* marked puts the stage in a paragraph. With the stage lifted out of the flow
+   that paragraph is empty, and its margins would otherwise collapse up through
+   everything above and push the whole page down the screen. */
+body.sliders-cinema #page > article > div > p {
+	margin: 0;
+}
+
+/* Absolute rather than a flex child, because Markdown wraps the element in a
+   <p> on its way out and an absolutely positioned box ignores static ancestors:
+   the stage measures against the <div> above no matter what marked put between
+   them. The cost is that two [scene] blocks in one passage would stack; a scene
+   passage is one screen. */
+body.sliders-cinema sliders-stage {
+	aspect-ratio: auto;
+	border-radius: 0;
+	inset: 0;
+	position: absolute;
+}
+
+/* The links under the stage have nothing below them any more, so they ride on
+   top of it. Still ordinary links: focus and screen readers are unchanged. */
+body.sliders-cinema #page > article .fork {
+	background: linear-gradient(rgb(0 0 0 / 0%), rgb(0 0 0 / 75%));
+	bottom: 0;
+	left: 0;
+	padding: 3em 1em 0.75em;
+	position: absolute;
+	right: 0;
+	z-index: 60;
+}
+
+body.sliders-cinema #page > article .fork p .link {
+	color: #fff;
+}
+
+body.sliders-cinema #page > article .fork p .link + .link {
+	border-top-color: rgb(255 255 255 / 30%);
+}
+
+/* Testing-only surfaces. Both hide themselves when they have nothing to say, so
+   they cost nothing here; when they do appear they must not push the stage out
+   of the viewport. Above the stage's own error panel (z-index 200), because a
+   broken scene is exactly when both are on screen at once. */
+body.sliders-cinema #page > warning-list,
+body.sliders-cinema #page > error-handler.active {
+	left: 0;
+	margin: 0;
+	max-height: 40vh;
+	max-height: 40dvh;
+	overflow: auto;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 300;
+}
+
+body.sliders-cinema #page > error-handler.active {
+	z-index: 400;
+}

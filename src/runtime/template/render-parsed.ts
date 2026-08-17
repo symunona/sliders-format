@@ -1,5 +1,6 @@
 import {marked} from 'marked';
 import {createLoggers} from '../logger';
+import {sceneOnlyBlocks} from '../sliders/cinema';
 import {set} from '../state';
 import {Insert} from './inserts';
 import {markdownRenderer} from './markdown-renderer';
@@ -66,12 +67,19 @@ export function renderParsed(
 		}
 	}
 
+	// New in the Sliders fork: in a passage that has a `[scene]`, the scene is the
+	// whole passage -- prose, director's notes and other modifiers around it are
+	// not drawn. This runs after the vars above have been dispatched so that a
+	// passage can opt out with `sliders.sceneOnly: false` in its own vars section.
+
+	const blocks = sceneOnlyBlocks(parsed.blocks);
+
 	// Parse the blocks in sequence.
 
 	let activeModifiers = [];
 	const modifierState: Map<Modifier, Record<string, unknown>> = new Map();
 
-	for (const block of parsed.blocks) {
+	for (const block of blocks) {
 		switch (block.type) {
 			case 'text': {
 				const blockOutput = {

@@ -30,18 +30,39 @@ links:
 
 [note]
 Director's note. Chapbook already hides this. Free.
-
-[continued]
-Normal Chapbook Markdown still works down here.
 ```
 
 The design rule is **declarative snapshot, not commands**: a scene block states
 the complete stage, and the engine diffs it against the previous stage to derive
 transitions. Paste a block anywhere and you get an identical stage.
 
+## How a scene is played
+
+A passage with a `[scene]` in it **is** the scene. Two things follow from that,
+and both are the default:
+
+- The stage fills the viewport. The page Chapbook draws around prose — the
+  centred column, the header, the footer — gets out of the way, and the scene's
+  `links:` ride along the bottom of the screen.
+- Nothing written outside the YAML is drawn. Prose, `[note]`, `[continued]` and
+  any other modifier around the scene are ignored, so a scene passage can carry
+  director's notes without them reaching the player. The vars section still
+  runs: it sets state, it doesn't write to the page.
+
+Because of the second one, **every way out of a scene passage has to be in its
+`links:`** — a `[[link]]` written under the block is not drawn.
+
+Either half can be turned off, per passage or per story, in the vars section:
+
+```
+sliders.sceneOnly: false     # draw the text around the scene as well
+sliders.fullScreen: false    # keep the stage in a 16:9 box inside the page
+```
+
 Everything else — the vars section, Markdown, inserts, `[if]`, `[after]`,
-`[note]`, ambient sound, backstage, save/load — is Chapbook's, unchanged. Sliders
-is Chapbook **plus** scenes, never Chapbook minus anything.
+`[note]`, ambient sound, backstage, save/load — is Chapbook's, unchanged, and a
+passage with no scene in it is an ordinary Chapbook passage. Sliders is Chapbook
+**plus** scenes, never Chapbook minus anything.
 
 See `docs/sliders/` in the twinejs-sliders repository for the full spec.
 
@@ -156,7 +177,8 @@ What this repo owns, and all it owns:
 
 - `src/runtime/template/modifiers/scene.ts` -- the `[scene]` modifier
 - `src/runtime/sliders/` -- the `<sliders-stage>` element, the hidden-passage
-  asset resolver, and boot-time scene index validation
+  asset resolver, boot-time scene index validation, and `cinema.ts`, which is
+  how a scene passage becomes the whole screen
 - `src/twine-extensions/` -- the CM5 mode, reference parser and toolbar
 
 ## Credit

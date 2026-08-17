@@ -1,5 +1,7 @@
 :: Scene modifier
-This is the one thing Sliders adds to Chapbook. Click the stage to advance beats.
+This line is not drawn. A passage with a [scene] in it is played full screen,
+and only the scene is played -- prose, notes and other modifiers around the YAML
+are ignored. Click the stage to advance beats.
 
 [scene]
 id: tavern-night
@@ -20,6 +22,7 @@ beats:
   - box: "The candle gutters."
 links:
   stay: {to: Scene modifier patch}
+  page: {to: Scene modifier in the page}
   go: {to: Start}
 
 [note]
@@ -27,8 +30,8 @@ Director: she should feel cornered. This is Chapbook's own note modifier, and it
 is not rendered.
 
 [continued]
-Normal Chapbook Markdown still works down here. **Bold**, *italic*, and
-{link to: 'Start', label: 'inserts'} are all unaffected.
+Normal Chapbook Markdown is still not rendered here, because this passage has a
+scene. Every way out of a scene passage has to be in its `links:`.
 
 :: Scene modifier patch
 A scene with `from:` is a patch over another scene's state, not a snapshot.
@@ -44,6 +47,25 @@ beats:
 links:
   back: {to: Scene modifier}
 
+:: Scene modifier in the page
+sliders.sceneOnly: false
+sliders.fullScreen: false
+--
+Both halves of the default format are variables, so a passage can have its
+Chapbook page back: a stage in a 16:9 box with **Markdown**, inserts and
+{link to: 'Start', label: 'links'} around it.
+
+[scene]
+id: tavern-inline
+from: tavern-night
+beats:
+  - box: "The same scene, sitting in the page."
+
+[continued]
+Text under the stage is drawn again, because `sliders.sceneOnly` is false here.
+
+[[Scene modifier]]
+
 :: Scene modifier errors
 A scene that doesn't parse still renders whatever could be understood, and
 reports the rest through Chapbook's warning list rather than throwing.
@@ -57,6 +79,4 @@ beats:
   - wait: soon
 links:
   nowhere: {}
-
-[continued]
-[[Start]]
+  back: {to: Start}

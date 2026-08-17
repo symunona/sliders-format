@@ -4,6 +4,7 @@
 import {parseScene} from '@sliders/scene-schema';
 import {SceneError} from '@sliders/scene-types';
 import {createLoggers} from '../../logger';
+import {SCENE_MODIFIER} from '../../sliders/cinema';
 import {encodePayload} from '../../sliders/stage-element';
 import {get} from '../../state';
 import {Modifier} from './types';
@@ -43,7 +44,7 @@ function describe(error: SceneError) {
  * returns a scene.
  */
 export const sceneModifier: Modifier = {
-	match: /^scene$/i,
+	match: SCENE_MODIFIER,
 	processRaw(output, {state}) {
 		const {scene, errors} = parseScene(output.text);
 		const messages = errors.map(describe);

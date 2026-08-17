@@ -18,7 +18,9 @@ import {createLoggers} from '../logger';
 import {get, set} from '../state';
 import {CustomElement} from '../util/custom-element';
 import {assetResolver} from './assets';
+import {enterCinema, fullScreenEnabled, leaveCinema} from './cinema';
 import {resolveFrom} from './scene-index';
+import './cinema.css';
 import './stage-element.css';
 
 const {warn} = createLoggers('scene');
@@ -73,6 +75,8 @@ export class SlidersStage extends CustomElement {
 	/** Index into #states. 0 is the stage before any beat has run. */
 	#position = 0;
 	#timer?: number;
+	/** Did this element put the page into full screen? Only it may take it out. */
+	#cinema = false;
 	#advance = (event: Event) => {
 		// A click on a link inside a bubble navigates; it must not also advance.
 		if ((event.target as HTMLElement | null)?.closest('a')) {
@@ -87,6 +91,18 @@ export class SlidersStage extends CustomElement {
 
 		if (!payload) {
 			return;
+		}
+
+		// Claimed before anything is drawn, and synchronously, so the renderer
+		// measures the viewport-sized host rather than the 16:9 box it would have
+		// had inside the page and then relaying out.
+		if (fullScreenEnabled()) {
+			this.#cinema = true;
+			// Inline, and before mount(): the renderer makes its host a containing
+			// block by setting `position` itself unless one is already there, and an
+			// inline style is the only thing cinema.css cannot outrank afterwards.
+			this.style.position = 'absolute';
+			enterCinema();
 		}
 
 		if (payload.errors?.length) {
@@ -135,6 +151,11 @@ export class SlidersStage extends CustomElement {
 	}
 
 	disconnectedCallback() {
+		if (this.#cinema) {
+			this.#cinema = false;
+			leaveCinema();
+		}
+
 		this.removeEventListener('click', this.#advance);
 		window.clearTimeout(this.#timer);
 		this.#dialogue?.destroy();
